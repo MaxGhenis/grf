@@ -11,7 +11,7 @@ validate_X <- function(X) {
   if (inherits(X, "Matrix") & !(inherits(X, "dgCMatrix"))) {
       stop("Currently only sparse data of class 'dgCMatrix' is supported.")
   }
-  
+
   if (any(is.na(X))){
     stop("The feature matrix X contains at least one NA.")
   }
@@ -21,17 +21,17 @@ validate_observations <- function(lv,X) {
   if (!is.list(lv)){
     lv <- list(lv)
   }
-  
+
   lapply(lv, function(V) {
     if (!is.vector(V) || (!is.numeric(V) && !is.logical(V))) {
       stop(paste( "Observations (W, Y, or Z) must be numeric vectors. GRF does not",
                   "currently support non-numeric or non-vector observations."))
     }
-    
+
     if (any(is.na(V))) {
       stop("The vector of observations (W, Y, or Z) contains at least one NA.")
     }
-    
+
     if (length(V) != nrow(X)) {
       stop("length of observation (W, Y, or Z) does not equal nrow(X).") }
   })
@@ -191,9 +191,9 @@ validate_newdata <- function(newdata, X) {
   validate_X(newdata)
 }
 
-validate_sample_weights = function(sample.weights, X) { 
+validate_sample_weights = function(sample.weights, X) {
     if(!is.null(sample.weights)) {
-        if(length(sample.weights) != nrow(X)) { 
+        if(length(sample.weights) != nrow(X)) {
             stop("sample.weights has incorrect length")
         }
         if(any(sample.weights < 0)) {
@@ -210,7 +210,7 @@ coerce_honesty_fraction <- function(honesty.fraction) {
 }
 
 create_data_matrices <- function(X, ..., sample.weights=NULL) {
-  default.data <- matrix(nrow=0, ncol=0);    
+  default.data <- matrix(nrow=0, ncol=0);
   sparse.data <- new("dgCMatrix", Dim = c(0L, 0L))
 
   if (inherits(X, "dgCMatrix") && ncol(X) > 1) {

@@ -131,10 +131,12 @@ causal_forest <- function(X, Y, W,
                           tune.parameters = FALSE,
                           num.fit.trees = 200,
                           num.fit.reps = 50,
-                          num.optimize.reps = 1000) {
+                          num.optimize.reps = 1000,
+                          tuning.method = "kriging") {
+    
     validate_X(X)
 
-    validate_observations(list(Y,W), X)
+    validate_observations(list(Y, W), X)
     
     num.threads <- validate_num_threads(num.threads)
     seed <- validate_seed(seed)
@@ -184,7 +186,8 @@ causal_forest <- function(X, Y, W,
                                           honesty.fraction = honesty.fraction,
                                           seed = seed,
                                           clusters = clusters,
-                                          samples_per_cluster = samples_per_cluster)
+                                          samples_per_cluster = samples_per_cluster,
+                                          tuning.method = tuning.method)
       tunable.params <- tuning.output$params
     } else {
       tunable.params <- c(
