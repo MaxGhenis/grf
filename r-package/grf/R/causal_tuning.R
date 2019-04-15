@@ -81,7 +81,7 @@ tune_causal_forest <- function(X, Y, W, Y.hat, W.hat,
                                seed = NULL,
                                clusters = NULL,
                                samples_per_cluster = NULL,
-                               tuning.method = "kriging") {
+                               tuning.method = NULL) {
   
   validate_X(X)
   if(length(Y) != nrow(X)) { stop("Y has incorrect length.") }
@@ -140,13 +140,16 @@ tune_causal_forest <- function(X, Y, W, Y.hat, W.hat,
   
   # To determine the optimal parameter values, predict using the kriging model at a large
   # number of random values, then select those that produced the lowest error.
-  optimize.draws = matrix(runif(num.optimize.reps * num.params), num.optimize.reps, num.params)
-  colnames(optimize.draws) = names(tuning.params)
+  optimize.draws <- matrix(runif(num.optimize.reps * num.params), num.optimize.reps, num.params)
+  colnames(optimize.draws) <- names(tuning.params)
 
-  best <- switch(tuning.method,
-       "kriging"=optimize_kriging(fit.draws, debiased.errors, optimize.draws),
-       "earth"=optimize_earth(fit.draws, debiased.errors, optimize.draws),
-       stop("Unknown tuning.method")) # TODO: Move to 'validate.tuning.method'
+  if (tuning.method == "kriging") {
+    best <- optimize_kriging(fit.draws, debiased.errors, optimize.draws)
+  } else if (tuning.method == "earth") {
+    best <- optimize_earth(fit.draws, debiased.errors, optimize.draws) 
+  } else {
+    stop("Unknown tuning.method") # Code should never reach this
+  }
   
   list(error = best$min.error, params = c(fixed.params, best$tuned.params))
 }
@@ -179,6 +182,26 @@ optimize_earth <- function(fit.draws, debiased.errors, optimize.draws) {
 }
 
 
+validate_tuning_config <- function(tune.parameters, tuning.method) {
+  # Check for consistency between tuning options
+  if (tune.parameters & is.null(tuning.method)) {
+    stop("When tune.parameters is TRUE, tuning.method cannot be NULL.")
+  }
+  if (!tune.parameters & !is.null(tuning.method)) {
+    stop("When tune.paramaters if FALSE, tuning.method must be NULL.")
+  }
+
+  if (is.null(tuning.method)) {
+    return(NULL)
+  } else {
+    if (tuning.method %in% c("earth", "kriging")) {
+      return(tuning.method)
+    } else {
+      stop("Invalid tuning method.")
+    }
+  }
+  
+}
 
 
 

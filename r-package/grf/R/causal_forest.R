@@ -143,6 +143,7 @@ causal_forest <- function(X, Y, W,
     clusters <- validate_clusters(clusters, X)
     samples_per_cluster <- validate_samples_per_cluster(samples_per_cluster, clusters)
     honesty.fraction <- validate_honesty_fraction(honesty.fraction, honesty)
+    tuning.method <- validate_tuning_config(tune.parameters, tuning.method)
 
     reduced.form.weight <- 0
 
