@@ -16,6 +16,8 @@ if (nchar(array_task_id) > 0) {
 } else {
   first_seed <- sample.int(1000000, size=1)
 }
+print("FIRST SEED")
+print(first_seed)
 
 config <- expand.grid(
   tm=c("none", "earth", "kriging"),
@@ -37,7 +39,6 @@ result <- sapply(seq(nrow(config)), function(i) {
     tm = cfg$tm
   }
   cfg$data <- df$name
-  browser()
   tau.forest = causal_forest(
     df$X, df$Y, df$W, 
     tune.parameters = cfg$tm != "none", 
@@ -47,4 +48,4 @@ result <- sapply(seq(nrow(config)), function(i) {
   c(cfg, mse.oob=mse.oob)
 })
 
-result <- t(result)
+write.csv(t(result), file=sprintf("results_%d.csv", first_seed))
